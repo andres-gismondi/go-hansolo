@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	log "github.com/sirupsen/logrus"
 	"go-hansolo/pkg/server/model"
 	"math"
@@ -24,15 +25,13 @@ var Sato = model.Satellite{
 	Position: model.Coordinates{X: 500, Y: 100},
 }
 
-var locationLogger log.Logger
-
-func (LocationImpl) GetLocation(distances ...float64) (x, y float64) {
+func (LocationImpl) GetLocation(distances ...float64) (x, y float64, err error) {
 	/*
 	* At this point i dont know wich distances corresponds to each satellite, so
 	* i suppose that the first distance corresponds to kenoby and the last to Sato
 	 */
 	// x0 sky; x1 kenoby; x2 sato
-	locationLogger := log.WithFields(log.Fields{"Distances": distances})
+	locationLogger := log.WithFields(log.Fields{"distances": distances})
 
 	kenobyDistance := distances[0]
 	skywalkerDistance := distances[1]
@@ -40,12 +39,12 @@ func (LocationImpl) GetLocation(distances ...float64) (x, y float64) {
 
 	dx, dy, d := GetDistances()
 	if d > (kenobyDistance + skywalkerDistance) {
-		locationLogger.Error("Distances between satellites are longer than radius")
-		return 0,0
+		locationLogger.Error("distances between satellites are longer than radius")
+		return 0,0, errors.New("distances between satellites are longer than radius")
 	}
 	if d < math.Abs(kenobyDistance-skywalkerDistance) {
-		locationLogger.Error("Distances not belong to correct point in common")
-		return 0,0
+		locationLogger.Error("distances not belong to correct point in common")
+		return 0,0, errors.New("distances not belong to correct point in common")
 	}
 
 	a := ((kenobyDistance*kenobyDistance) - (skywalkerDistance*skywalkerDistance) + (d*d)) / (2.0 * d)
@@ -65,12 +64,12 @@ func (LocationImpl) GetLocation(distances ...float64) (x, y float64) {
 		resulty = intersectionP2y
 	}else{
 		locationLogger.WithField("y", resulty).WithField("x", resultx)
-		locationLogger.Error("Can get coordinates")
-		return 0, 0
+		locationLogger.Error("can get coordinates")
+		return 0, 0, errors.New("can get coordinates")
 	}
 
-	locationLogger.WithField("y", resulty).WithField("x", resultx).Info("Coordinates founded")
-	return resultx, resulty
+	locationLogger.WithField("y", resulty).WithField("x", resultx).Info("coordinates founded")
+	return resultx, resulty, nil
 }
 
 func GetDistances() (dx, dy , d float64) {

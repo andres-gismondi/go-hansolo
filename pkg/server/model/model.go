@@ -10,6 +10,10 @@ type RequestSatellite struct {
 	Message []string	`json:"message"`
 }
 
+type RequestSplitSatellite struct {
+
+}
+
 type ResponseModel struct {
 	Position Coordinates	`json:"position"`
 	Message string			`json:"message"`

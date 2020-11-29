@@ -1,6 +1,8 @@
 package services
 
 import (
+	"errors"
+	_ "github.com/go-sql-driver/mysql"
 	log "github.com/sirupsen/logrus"
 	"strings"
 )
@@ -9,16 +11,16 @@ type MessageImpl struct {
 
 }
 
-func (MessageImpl) GetMessage(messages ...[]string) (mes string) {
-	messagesLogger := log.WithFields(log.Fields{"Messages": messages})
+func (MessageImpl) GetMessage(messages ...[]string) (string, error) {
+	messagesLogger := log.WithFields(log.Fields{"messages": messages})
 	sentence, condition := ConcatenateSlices(messages)
 	if !condition {
-		messagesLogger.Error("Can not decode message")
-		return "Can not decode message"
+		messagesLogger.Error("can not decode message")
+		return "can not decode message", errors.New("can not decode message")
 	}
 	msg := strings.Join(sentence, " ")
-	messagesLogger.Info("Message got it")
-	return msg
+	messagesLogger.Info("message got it")
+	return msg, nil
 }
 
 func ConcatenateSlices(messages [][]string) ([]string, bool) {
