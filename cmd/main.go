@@ -17,8 +17,8 @@ func main() {
 	message := services.GetMessage(m1, m2, m3)
 	fmt.Println(message)*/
 
-	port := os.Getenv("PORT")
-	serv, err := server.New(port)
+	//port := os.Getenv("PORT")
+	serv, err := server.New("8083")
 	if err != nil {
 		log.Fatal(err)
 	}
