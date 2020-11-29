@@ -24,6 +24,8 @@ var Sato = model.Satellite{
 	Position: model.Coordinates{X: 500, Y: 100},
 }
 
+var locationLogger log.Logger
+
 func (LocationImpl) GetLocation(distances ...float64) (x, y float64) {
 	/*
 	* At this point i dont know wich distances corresponds to each satellite, so
@@ -35,10 +37,8 @@ func (LocationImpl) GetLocation(distances ...float64) (x, y float64) {
 	kenobyDistance := distances[0]
 	skywalkerDistance := distances[1]
 	satoDistance := distances[2]
-	dx := kenoby.Position.X - Skywalker.Position.X
-	dy := kenoby.Position.Y - Skywalker.Position.Y
 
-	d := math.Sqrt((dy * dy) + (dx * dx))
+	dx, dy, d := GetDistances()
 	if d > (kenobyDistance + skywalkerDistance) {
 		locationLogger.Error("Distances between satellites are longer than radius")
 		return 0,0
@@ -49,29 +49,11 @@ func (LocationImpl) GetLocation(distances ...float64) (x, y float64) {
 	}
 
 	a := ((kenobyDistance*kenobyDistance) - (skywalkerDistance*skywalkerDistance) + (d*d)) / (2.0 * d)
-
-	//Hipotenusa y demas. Ver bien
-	//http://paulbourke.net/geometry/circlesphere/ || fin for "two circles"
-	p2x := kenoby.Position.X + (dx * (a/d))
-	p2y := kenoby.Position.Y + (dy * (a/d))
-	h := math.Sqrt((kenobyDistance*kenobyDistance) - (a*a))
-	rx := -dy * (h/d)
-	ry := dx * (h/d)
-
-	intersectionP1x := p2x + rx
-	intersectionP2x := p2x - rx
-	intersectionP1y := p2y + ry
-	intersectionP2y := p2y - ry
+	intersectionP1x, intersectionP2x, intersectionP1y, intersectionP2y := GetIntersectionPoints(dx, dy, a, d, kenobyDistance)
 
 	//Ahora calcula la distancia del punto de intx con el punto sato
 	//si cohinciden alguno de los dos es que hay interseccion entre los tres satellites
-	dx = intersectionP1x - Sato.Position.X
-	dy = intersectionP1y - Sato.Position.Y
-	d1 := math.Sqrt((dy*dy) + (dx*dx))
-
-	dx = intersectionP2x - Sato.Position.X
-	dy = intersectionP2y - Sato.Position.Y
-	d2 := math.Sqrt((dy*dy) + (dx*dx))
+	d1, d2 := GetLastPointIntersection(dx, dy, intersectionP1x, intersectionP1y, intersectionP2x, intersectionP2y)
 
 	var resultx float64
 	var resulty float64
@@ -89,4 +71,35 @@ func (LocationImpl) GetLocation(distances ...float64) (x, y float64) {
 
 	locationLogger.WithField("y", resulty).WithField("x", resultx).Info("Coordinates founded")
 	return resultx, resulty
+}
+
+func GetDistances() (dx, dy , d float64) {
+	dx = kenoby.Position.X - Skywalker.Position.X
+	dy = kenoby.Position.Y - Skywalker.Position.Y
+
+	d = math.Sqrt((dy * dy) + (dx * dx))
+	return dx, dy, d
+}
+
+func GetIntersectionPoints(dx, dy, a, d, kDistance float64) (p1x, p1y, p2x, p2y float64) {
+	//Hipotenusa y demas. Ver bien
+	//http://paulbourke.net/geometry/circlesphere/ || fin for "two circles"
+	p2x = kenoby.Position.X + (dx * (a/d))
+	p2y = kenoby.Position.Y + (dy * (a/d))
+	h := math.Sqrt((kDistance * kDistance) - (a*a))
+	rx := -dy * (h/d)
+	ry := dx * (h/d)
+	return p2x + rx, p2x - rx, p2y + ry, p2y - ry
+}
+
+func GetLastPointIntersection(dx, dy, intP1x, intP1y, intP2x, intP2y float64) (d1, d2 float64) {
+	dx = intP1x - Sato.Position.X
+	dy = intP1y - Sato.Position.Y
+	d1 = math.Sqrt((dy*dy) + (dx*dx))
+
+	dx = intP2x - Sato.Position.X
+	dy = intP2y - Sato.Position.Y
+	d2 = math.Sqrt((dy*dy) + (dx*dx))
+
+	return d1, d2
 }
