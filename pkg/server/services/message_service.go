@@ -1,4 +1,25 @@
-package utils
+package services
+
+import (
+	log "github.com/sirupsen/logrus"
+	"strings"
+)
+
+type MessageImpl struct {
+
+}
+
+func (MessageImpl) GetMessage(messages ...[]string) (mes string) {
+	messagesLogger := log.WithFields(log.Fields{"Messages": messages})
+	sentence, condition := ConcatenateSlices(messages)
+	if !condition {
+		messagesLogger.Error("Can not decode message")
+		return "Can not decode message"
+	}
+	msg := strings.Join(sentence, " ")
+	messagesLogger.Info("Message got it")
+	return msg
+}
 
 func ConcatenateSlices(messages [][]string) ([]string, bool) {
 	var cleanSlice []string

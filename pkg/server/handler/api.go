@@ -1,4 +1,4 @@
-package controller
+package handler
 
 import (
 	"github.com/go-chi/chi"

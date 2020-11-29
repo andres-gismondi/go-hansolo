@@ -1,6 +1,7 @@
-package controller
+package handler
 
 import (
+	log "github.com/sirupsen/logrus"
 	"encoding/json"
 	"go-hansolo/pkg/server/model"
 	"net/http"
@@ -10,11 +11,13 @@ func JSON(writer http.ResponseWriter, request *http.Request, statusCode int, dat
 	if data == nil {
 		writer.Header().Set("Content-Type", "application/json; charset=utf-8")
 		writer.WriteHeader(statusCode)
+		log.Warn("Empty data")
 		return nil
 	}
 
 	j, err := json.Marshal(data)
 	if err != nil {
+		log.Error("Error marshaling data")
 		return err
 	}
 

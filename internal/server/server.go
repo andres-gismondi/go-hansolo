@@ -2,7 +2,7 @@ package server
 
 import (
 	"github.com/go-chi/chi"
-	api "go-hansolo/pkg/server/controller"
+	api "go-hansolo/pkg/server/handler"
 	"log"
 	"net/http"
 	"time"

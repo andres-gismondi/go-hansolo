@@ -1,11 +1,14 @@
 package services
 
 import (
+	log "github.com/sirupsen/logrus"
 	"go-hansolo/pkg/server/model"
-	"go-hansolo/pkg/server/services/utils"
 	"math"
-	"strings"
 )
+
+type LocationImpl struct {
+
+}
 
 //Epsilon en UNO por las diferencias decimales
 const EPSILON = 1
@@ -21,12 +24,14 @@ var Sato = model.Satellite{
 	Position: model.Coordinates{X: 500, Y: 100},
 }
 
-func GetLocation(distances ...float64) (x, y float64) {
+func (LocationImpl) GetLocation(distances ...float64) (x, y float64) {
 	/*
 	* At this point i dont know wich distances corresponds to each satellite, so
 	* i suppose that the first distance corresponds to kenoby and the last to Sato
-	*/
+	 */
 	// x0 sky; x1 kenoby; x2 sato
+	locationLogger := log.WithFields(log.Fields{"Distances": distances})
+
 	kenobyDistance := distances[0]
 	skywalkerDistance := distances[1]
 	satoDistance := distances[2]
@@ -35,9 +40,11 @@ func GetLocation(distances ...float64) (x, y float64) {
 
 	d := math.Sqrt((dy * dy) + (dx * dx))
 	if d > (kenobyDistance + skywalkerDistance) {
+		locationLogger.Error("Distances between satellites are longer than radius")
 		return 0,0
 	}
 	if d < math.Abs(kenobyDistance-skywalkerDistance) {
+		locationLogger.Error("Distances not belong to correct point in common")
 		return 0,0
 	}
 
@@ -75,18 +82,11 @@ func GetLocation(distances ...float64) (x, y float64) {
 		resultx = intersectionP2x
 		resulty = intersectionP2y
 	}else{
-		resultx = 0
-		resulty = 0
+		locationLogger.WithField("y", resulty).WithField("x", resultx)
+		locationLogger.Error("Can get coordinates")
+		return 0, 0
 	}
 
+	locationLogger.WithField("y", resulty).WithField("x", resultx).Info("Coordinates founded")
 	return resultx, resulty
-}
-
-
-func GetMessage(messages ...[]string) (mes string) {
-	sentence, condition := utils.ConcatenateSlices(messages)
-	if !condition {
-		return "Can not decode message"
-	}
-	return strings.Join(sentence," ")
 }
