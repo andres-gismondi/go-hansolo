@@ -3,10 +3,10 @@ package handler
 import (
 	"encoding/json"
 	"github.com/go-chi/chi"
+	log "github.com/sirupsen/logrus"
 	"go-hansolo/pkg/server/model"
 	"go-hansolo/pkg/server/services"
 	"net/http"
-	log "github.com/sirupsen/logrus"
 )
 
 type Impl struct {
@@ -28,13 +28,13 @@ func (s *Impl) TopSecretHandler(writer http.ResponseWriter, request *http.Reques
 	err := json.NewDecoder(request.Body).Decode(&rm)
 
 	if err != nil {
-		_ = HTTPError(writer, request, http.StatusNotFound, err.Error())
+		_ = HTTPError(writer, http.StatusNotFound, err.Error())
 		return
 	}
 
 	distances = []float64{rm.Satellites[0].Distance,rm.Satellites[1].Distance,rm.Satellites[2].Distance}
 	messages = [][]string{rm.Satellites[0].Message,rm.Satellites[1].Message,rm.Satellites[2].Message}
-	s.GetService(distances,messages,writer,request)
+	s.GetService(distances,messages,writer)
 }
 
 func (s *Impl) GetSplitHandler(writer http.ResponseWriter, request *http.Request) {
@@ -42,7 +42,7 @@ func (s *Impl) GetSplitHandler(writer http.ResponseWriter, request *http.Request
 	log.Info("Get split with for satellite: " + satelliteName)
 
 	if satelliteName != "kenoby" && satelliteName != "skywalker" && satelliteName != "sato" {
-		_ = HTTPError(writer, request, http.StatusNotFound, "Satellite name not found")
+		_ = HTTPError(writer, http.StatusNotFound, "Satellite name not found")
 		return
 	}
 
@@ -52,9 +52,9 @@ func (s *Impl) GetSplitHandler(writer http.ResponseWriter, request *http.Request
 	if *kenobyName != "" && *skywalkerName != "" && *satoName != "" {
 		distances = []float64{Kenoby.Distance, Skywalker.Distance, Sato.Distance}
 		messages = [][]string{Kenoby.Message, Skywalker.Message, Sato.Message}
-		s.GetService(distances,messages,writer,request)
+		s.GetService(distances,messages,writer)
 	} else {
-		_ = HTTPError(writer, request, http.StatusNotFound, "Not enough information to get data")
+		_ = HTTPError(writer, http.StatusNotFound, "Not enough information to get data")
 		return
 	}
 }
@@ -63,7 +63,7 @@ func (s *Impl) PostSplitHandler(writer http.ResponseWriter, request *http.Reques
 	var rm model.RequestSatellite
 	err := json.NewDecoder(request.Body).Decode(&rm)
 	if err != nil {
-		_ = HTTPError(writer, request, http.StatusNotFound, err.Error())
+		_ = HTTPError(writer, http.StatusNotFound, err.Error())
 		return
 	}
 
@@ -84,21 +84,21 @@ func (s *Impl) PostSplitHandler(writer http.ResponseWriter, request *http.Reques
 		Sato.Distance = rm.Distance
 		Sato.Message = rm.Message
 	} else {
-		_ = HTTPError(writer, request, http.StatusNotFound, "Satellite name not found")
+		_ = HTTPError(writer, http.StatusNotFound, "Satellite name not found")
 		return
 	}
 
-	_ = JSON(writer, request, http.StatusAccepted, "Ok")
+	_ = JSON(writer, http.StatusAccepted, "Ok")
 }
 
-func (s *Impl) GetService(distances []float64, messages [][]string, writer http.ResponseWriter, request *http.Request) {
+func (s *Impl) GetService(distances []float64, messages [][]string, writer http.ResponseWriter) {
 	//500, 200, 1538
 	rX, rY, err := s.LocationService.GetLocation(
 		distances[0],
 		distances[1],
 		distances[2])
 	if err != nil {
-		_ = HTTPError(writer, request, http.StatusNotFound, "Cant get coordinates")
+		_ = HTTPError(writer, http.StatusNotFound, "Cant get coordinates")
 		return
 	}
 
@@ -107,7 +107,7 @@ func (s *Impl) GetService(distances []float64, messages [][]string, writer http.
 		messages[1],
 		messages[2])
 	if err != nil {
-		_ = HTTPError(writer, request, http.StatusNotFound, "Cant get message")
+		_ = HTTPError(writer, http.StatusNotFound, "Cant get message")
 		return
 	}
 
@@ -115,7 +115,7 @@ func (s *Impl) GetService(distances []float64, messages [][]string, writer http.
 		Position: model.Coordinates{X: rX, Y: rY},
 		Message: msg,
 	}
-	_ = JSON(writer, request, http.StatusAccepted, response)
+	_ = JSON(writer, http.StatusAccepted, response)
 }
 
 func (s *Impl) Routes() http.Handler {

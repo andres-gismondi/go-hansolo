@@ -1,13 +1,13 @@
 package handler
 
 import (
-	log "github.com/sirupsen/logrus"
 	"encoding/json"
+	log "github.com/sirupsen/logrus"
 	"go-hansolo/pkg/server/model"
 	"net/http"
 )
 
-func JSON(writer http.ResponseWriter, request *http.Request, statusCode int, data interface{}) error {
+func JSON(writer http.ResponseWriter, statusCode int, data interface{}) error {
 	if data == nil {
 		writer.Header().Set("Content-Type", "application/json; charset=utf-8")
 		writer.WriteHeader(statusCode)
@@ -27,9 +27,9 @@ func JSON(writer http.ResponseWriter, request *http.Request, statusCode int, dat
 	return nil
 }
 
-func HTTPError(writer http.ResponseWriter, request *http.Request, statusCode int, message string) error {
+func HTTPError(writer http.ResponseWriter, statusCode int, message string) error {
 	msg := model.ErrorResponse{
 		Message: message,
 	}
-	return JSON(writer, request, statusCode, msg)
+	return JSON(writer, statusCode, msg)
 }

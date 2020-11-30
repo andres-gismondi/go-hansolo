@@ -8,13 +8,12 @@ import (
 )
 
 type LocationImpl struct {
-
 }
 
-//Epsilon en UNO por las diferencias decimales
+//Epsilon set to 1
 const EPSILON = 1
 
-//Coordenadas fijas dadas por el problema
+//Default
 var kenoby = model.Satellite{
 	Position: model.Coordinates{X: -500, Y: -200},
 }
@@ -30,7 +29,6 @@ func (LocationImpl) GetLocation(distances ...float64) (x, y float64, err error) 
 	* At this point i dont know wich distances corresponds to each satellite, so
 	* i suppose that the first distance corresponds to kenoby and the last to Sato
 	 */
-	// x0 sky; x1 kenoby; x2 sato
 	locationLogger := log.WithFields(log.Fields{"distances": distances})
 
 	kenobyDistance := distances[0]
@@ -50,8 +48,8 @@ func (LocationImpl) GetLocation(distances ...float64) (x, y float64, err error) 
 	a := ((kenobyDistance*kenobyDistance) - (skywalkerDistance*skywalkerDistance) + (d*d)) / (2.0 * d)
 	intersectionP1x, intersectionP2x, intersectionP1y, intersectionP2y := GetIntersectionPoints(dx, dy, a, d, kenobyDistance)
 
-	//Ahora calcula la distancia del punto de intx con el punto sato
-	//si cohinciden alguno de los dos es que hay interseccion entre los tres satellites
+	//Calculate distance between intersections with Sato satellite
+	//If any intersection match with distances its means that exist triangulation
 	d1, d2 := GetLastPointIntersection(dx, dy, intersectionP1x, intersectionP1y, intersectionP2x, intersectionP2y)
 
 	var resultx float64
@@ -81,8 +79,8 @@ func GetDistances() (dx, dy , d float64) {
 }
 
 func GetIntersectionPoints(dx, dy, a, d, kDistance float64) (p1x, p1y, p2x, p2y float64) {
-	//Hipotenusa y demas. Ver bien
-	//http://paulbourke.net/geometry/circlesphere/ || fin for "two circles"
+
+	//http://paulbourke.net/geometry/circlesphere/ || find for "two circles"
 	p2x = kenoby.Position.X + (dx * (a/d))
 	p2y = kenoby.Position.Y + (dy * (a/d))
 	h := math.Sqrt((kDistance * kDistance) - (a*a))
