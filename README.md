@@ -6,7 +6,7 @@ This project is about triangulate coordinates from an object using three differe
 
 How to calculate intersections between circles: http://paulbourke.net/geometry/circlesphere/ *(search Intersection of two Circles)*
 
-#How to
+# How to
 You can run it locally running the following command:  
 `go run cmd/main.go` 
 
@@ -16,12 +16,12 @@ Build it with the following command:
 and execute it with:  
 `./cmd`
 
-#Host
+# Host
 URL: `https://erudite-wind-297223.uc.r.appspot.com/api/hansolo`
 
-#Request
-##POST
-####/topsecret
+# Request
+## POST
+#### /topsecret
 `https://erudite-wind-297223.uc.r.appspot.com/api/hansolo/topsecret`  
 ```json
 { 
@@ -44,7 +44,7 @@ URL: `https://erudite-wind-297223.uc.r.appspot.com/api/hansolo`
     ] 
 }
 ```
-#####Response - Code: 202 - Accepted
+##### Response - Code: 202 - Accepted
 ```json
 {
     "position": {
@@ -54,19 +54,19 @@ URL: `https://erudite-wind-297223.uc.r.appspot.com/api/hansolo`
     "message": "este es un mensaje secreto"
 }
 ```
-#####Response - Code: 404 - Not found
+##### Response - Code: 404 - Not found
 ```json
 {
     "message": "Cant get coordinates"
 }
 ```
-#####Response - Code: 404 - Not found
+##### Response - Code: 404 - Not found
 ```json
 {
     "message": "Cant get message"
 }
 ```
-####/topsecret_split/{satellite_name}
+#### /topsecret_split/{satellite_name}
 `https://erudite-wind-297223.uc.r.appspot.com/api/hansolo/topsecret_split/{satellite_name}`  
 ```json
 {
@@ -74,17 +74,17 @@ URL: `https://erudite-wind-297223.uc.r.appspot.com/api/hansolo`
     "message": ["este", "", "un", "", ""]
 }
 ```
-#####Response - Code: 200 - Ok
-##GET
-####/topsecret_split/{satellite_name}
+##### Response - Code: 200 - Ok
+## GET
+#### /topsecret_split/{satellite_name}
 `https://erudite-wind-297223.uc.r.appspot.com/api/hansolo/topsecret_split/{satellite_name}`  
-#####Response - Code: 404 - Not found
+##### Response - Code: 404 - Not found
 ```json
 {
     "message": "Not enough information to get data"
 }
 ```
-#####Response - Code: 202 - Accepted
+##### Response - Code: 202 - Accepted
 ```json
 {
     "position": {
