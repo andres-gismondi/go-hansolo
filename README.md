@@ -14,7 +14,7 @@ Build it with the following command:
 `go build cmd/main.go`     
 
 and execute it with:  
-`./cmd` 
+`./cmd`
 
 #Host
 URL: `https://erudite-wind-297223.uc.r.appspot.com/api/hansolo`
