@@ -21,7 +21,7 @@ URL: `https://erudite-wind-297223.uc.r.appspot.com/api/hansolo`
 
 # Request
 ## POST
-#### /topsecret
+### /topsecret
 `https://erudite-wind-297223.uc.r.appspot.com/api/hansolo/topsecret`  
 ```json
 { 
@@ -66,7 +66,7 @@ URL: `https://erudite-wind-297223.uc.r.appspot.com/api/hansolo`
     "message": "Cant get message"
 }
 ```
-#### /topsecret_split/{satellite_name}
+### /topsecret_split/{satellite_name}
 `https://erudite-wind-297223.uc.r.appspot.com/api/hansolo/topsecret_split/{satellite_name}`  
 ```json
 {
@@ -76,7 +76,7 @@ URL: `https://erudite-wind-297223.uc.r.appspot.com/api/hansolo`
 ```
 ##### Response - Code: 200 - Ok
 ## GET
-#### /topsecret_split/{satellite_name}
+### /topsecret_split/{satellite_name}
 `https://erudite-wind-297223.uc.r.appspot.com/api/hansolo/topsecret_split/{satellite_name}`  
 ##### Response - Code: 404 - Not found
 ```json
